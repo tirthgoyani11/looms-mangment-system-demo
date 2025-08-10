@@ -7,17 +7,17 @@ import Reports from './pages/Reports';
 import Navbar from './components/Navbar';
 
 export default function App() {
-return (
-<Router>
-<Navbar />
-<Routes>
-<Route path="/" element={<Navigate to="/login" replace />} />
-<Route path="/login" element={<Login />} />
-<Route path="/register" element={<Register />} />
-<Route path="/dashboard" element={<Dashboard />} />
-<Route path="/reports" element={<Reports />} />
-<Route path="*" element={<div style={{ padding: 24 }}>404 Not Found</div>} />
-</Routes>
-</Router>
-);
+  return (
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="*" element={<div style={{ padding: 24 }}>404 Not Found</div>} />
+      </Routes>
+    </Router>
+  );
 }
