@@ -1,64 +1,55 @@
-import React, { useContext } from 'react';
 
-// Import the AppContext to access the global state (like the current page).
+import React, { useState, useContext } from 'react';
 import { AppContext } from '../App';
 
-/**
- * The NavLink component is a helper for creating navigation links.
- * It automatically checks if its route matches the current page and applies an 'active' class.
- * @param {object} props - The component's props.
- * @param {string} props.to - The destination route for the link (e.g., 'dashboard').
- * @param {React.ReactNode} props.children - The text or elements to display inside the link.
- */
 const NavLink = ({ to, children }) => {
-  // Use the useContext hook to get the current 'page' from the AppContext.
-  const { page } = useContext(AppContext);
-  const isActive = page === to;
-
-  return (
-    <a
-      href={`#${to}`}
-      // Dynamically apply classes based on whether the link is active.
-      className={`nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 transition-all duration-300 border-b-2 ${
-        isActive ? 'active border-blue-500 text-white' : 'border-transparent hover:border-gray-500'
-      }`}
-    >
-      {children}
-    </a>
-  );
+    const { page } = useContext(AppContext);
+    return (
+        <a href={`#${to}`} className={`block md:inline-block px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${page === to ? 'text-white bg-gray-700/50' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'}`}>
+            {children}
+        </a>
+    );
 };
 
-/**
- * The main Navbar component.
- */
 const Navbar = () => {
-  return (
-    <header className="bg-gray-900/50 backdrop-blur-sm sticky top-0 z-20 border-b border-gray-700/50">
-      <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Left side: App Name/Logo */}
-          <div className="flex items-center">
-            <a href="#dashboard" className="text-2xl font-bold text-white">
-              FebriFlow
-            </a>
-          </div>
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { setIsAuthenticated } = useContext(AppContext);
 
-          {/* Right side: Navigation Links */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              <NavLink to="dashboard">Dashboard</NavLink>
-              <NavLink to="reports">Reports</NavLink>
-              {/* You can add more links here as you build out your app */}
-              {/* <NavLink to="machines">Machines</NavLink> */}
-              <NavLink to="login">Login</NavLink>
-            </div>
-          </div>
-          
-          {/* Mobile menu button would go here in a more complex implementation */}
-        </div>
-      </nav>
-    </header>
-  );
+    const handleLogout = () => {
+        setIsAuthenticated(false);
+        window.location.hash = '#login';
+    };
+
+    return (
+        <header className="bg-black/30 backdrop-blur-sm sticky top-0 z-20">
+            <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-16">
+                    <div className="flex items-center">
+                        <a href="#dashboard" className="text-2xl font-bold text-white">FebriFlow</a>
+                    </div>
+                    <div className="hidden md:block">
+                        <div className="ml-10 flex items-center space-x-4">
+                            <NavLink to="dashboard">Dashboard</NavLink>
+                            <NavLink to="reports">Reports</NavLink>
+                            <button onClick={handleLogout} className="bg-indigo-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-500 transition-colors duration-300">Logout</button>
+                        </div>
+                    </div>
+                    <div className="md:hidden">
+                        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-300 hover:text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white">
+                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+            {isMobileMenuOpen && (
+                <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <NavLink to="dashboard">Dashboard</NavLink>
+                    <NavLink to="reports">Reports</NavLink>
+                    <button onClick={handleLogout} className="w-full text-left bg-indigo-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-500 mt-1">Logout</button>
+                </div>
+            )}
+        </header>
+    );
 };
 
 export default Navbar;
