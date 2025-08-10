@@ -1,6 +1,70 @@
-:root { --pad: 16px; }
-* { box-sizing: border-box; }
-body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #fff; color: #111; }
-a { color: #0b5; text-decoration: none; }
-a:hover { text-decoration: underline; }
-nav a { color: #0366d6; }
+/**
+ * @file index.css
+ * @description Main stylesheet for the FebriFlow landing page.
+ * This file contains custom styles that complement the Tailwind CSS framework.
+ * @version 1.2.0
+ */
+
+/* * Base HTML and Body Styles
+ * We set a smooth scroll behavior for the whole page and define the default
+ * font family and colors for the dark theme.
+ */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #020617; /* Corresponds to Tailwind's slate-950 */
+  color: #e2e8f0; /* Corresponds to Tailwind's slate-200 */
+  overflow-x: hidden; /* Prevents horizontal scrollbars */
+}
+
+/* * 3D Background Canvas
+ * This positions the Three.js canvas behind all other content, creating
+ * the fixed, animated fabric effect.
+ */
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 0.3;
+}
+
+/* * Hero Section Custom Styles
+ * A custom class to create the striking gradient text effect.
+ */
+.hero-gradient-text {
+  background: linear-gradient(to right, #7dd3fc, #a78bfa); /* sky-300 to violet-400 */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+/* * Button Styles
+ * A base class for buttons to ensure they have a smooth transition effect.
+ */
+.btn {
+  transition: all 0.3s ease;
+}
+
+/* * Feature Card Styles
+ * These styles define the appearance of the feature cards, including the
+ * glassmorphism effect (backdrop-filter) and a hover animation.
+ */
+.feature-card {
+  background-color: rgba(30, 41, 59, 0.5); /* slate-800 with 50% opacity */
+  border: 1px solid #334155; /* slate-700 */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease-in-out;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  border-color: #6366f1; /* indigo-500 */
+}
