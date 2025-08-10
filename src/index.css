@@ -1,73 +1,55 @@
 /**
  * @file index.css
  * @description Global stylesheet for the FebriFlow React application.
- * This file includes Tailwind CSS's base styles, components, and utilities,
- * as well as custom styles for the application's theme.
+ * This file includes Tailwind CSS's base styles and custom styles for the app's theme.
  */
 
-/*
- * These are Tailwind CSS "directives". They are special at-rules that Tailwind
- * swaps out at build time with its generated CSS.
- * @tailwind base: Injects Tailwind's base styles and any base styles registered by plugins.
- * @tailwind components: Injects Tailwind's component classes and any component classes registered by plugins.
- * @tailwind utilities: Injects Tailwind's utility classes and any utility classes registered by plugins.
- */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/*
- * Custom base styles applied to the body element.
- */
 body {
-  /* Use the Inter font family defined in index.html, with system fonts as fallbacks. */
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  
-  /* A very dark gray for the main background, creating a modern, focused look. */
   background-color: #0a0a0a;
-  
-  /* A light gray for default text color, providing good contrast on the dark background. */
   color: #e5e7eb;
-  
-  /* Prevents accidental horizontal scrolling on the body. */
   overflow-x: hidden;
 }
 
-/*
- * Custom component styles. You can create your own reusable classes here
- * or apply styles directly to elements as we do below.
- */
-
-/*
- * Custom styling for the NavLink component to show the active state.
- */
 .nav-link.active {
-  color: #ffffff; /* White text for the active link */
-  border-bottom-color: #3b82f6; /* A blue underline to indicate the active page */
+  color: #ffffff;
+  border-bottom-color: #3b82f6;
 }
 
 /*
- * Custom styling for the card components used throughout the application.
- * This creates the "glassmorphism" effect.
+ * IMPORTANT: You can remove your old `.card` styles if you are replacing
+ * them with this new glassmorphism effect everywhere.
  */
-.card {
-  /* A semi-transparent dark background. */
-  background-color: rgba(17, 24, 39, 0.7);
-  
-  /* A subtle border to define the card's edges. */
-  border: 1px solid rgba(55, 65, 81, 0.5);
-  
-  /* A smooth transition for hover effects. */
+.glass-card {
+  background: rgba(23, 31, 47, 0.6); /* Semi-transparent background */
+  backdrop-filter: blur(20px); /* The "frosted glass" effect */
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+  border-radius: 1rem; /* More rounded corners */
+}
+
+/* New utility class for the input fields with icons */
+.input-field {
+  @apply w-full bg-gray-800/50 border border-gray-600 rounded-lg pl-10 pr-3 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300;
+}
+
+/* New utility class for the gradient button */
+.btn-gradient {
+  background-image: linear-gradient(to right, #4f46e5, #7c3aed);
+  box-shadow: 0 4px 15px 0 rgba(79, 70, 229, 0.5);
   transition: all 0.3s ease;
 }
 
-/*
- * A hover effect for the cards to provide visual feedback to the user.
- */
-.card:hover {
-  /* Slightly lift the card on hover. */
-  transform: translateY(-5px);
-  
-  /* Add a subtle shadow to enhance the "lifted" effect. */
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+.btn-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(79, 70, 229, 0.6);
+}
+
+.btn-gradient:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px 0 rgba(79, 70, 229, 0.5);
 }
