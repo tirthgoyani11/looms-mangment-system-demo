@@ -1,12 +1,470 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Looms Management System</title>
-  </head>
-  <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FebriFlow - Looms Management System</title>
+    <meta name="description" content="FebriFlow - A modern, Firebase-ready looms and fabric management system with a dynamic 3D background.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #e5e7eb;
+            overflow-x: hidden;
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+        }
+        .main-content {
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #ffffff;
+            border-bottom-color: #3b82f6;
+        }
+        .card {
+            background-color: rgba(17, 24, 39, 0.7);
+            border: 1px solid rgba(55, 65, 81, 0.5);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+    </style>
+</head>
+<body class="antialiased">
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-  </body>
+
+    <!-- 3D Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="root" class="min-h-screen flex flex-col">
+        <!-- Header & Navigation -->
+        <header class="bg-gray-900/50 backdrop-blur-sm sticky top-0 z-20 border-b border-gray-700/50">
+            <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <span class="text-2xl font-bold text-white">FebriFlow</span>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="#dashboard" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300">Dashboard</a>
+                            <a href="#looms" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300">Looms</a>
+                            <a href="#production" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300">Production</a>
+                            <a href="#inventory" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300">Inventory</a>
+                        </div>
+                    </div>
+                    <div class="-mr-2 flex md:hidden">
+                        <button id="mobile-menu-button" type="button" class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+                            <span class="sr-only">Open main menu</span>
+                            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+            <!-- Mobile menu, show/hide based on menu state. -->
+            <div class="md:hidden hidden" id="mobile-menu">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <a href="#dashboard" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-300">Dashboard</a>
+                    <a href="#looms" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-300">Looms</a>
+                    <a href="#production" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-300">Production</a>
+                    <a href="#inventory" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-300">Inventory</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="main-content" class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8">
+            <!-- Content will be injected here by JavaScript -->
+        </main>
+    </div>
+
+    <!-- Modal for adding/editing looms -->
+    <div id="loom-modal" class="fixed inset-0 z-30 hidden items-center justify-center modal-backdrop">
+        <div class="card w-full max-w-md p-6 rounded-lg shadow-xl">
+            <h2 id="modal-title" class="text-2xl font-bold mb-4">Add New Loom</h2>
+            <form id="loom-form">
+                <input type="hidden" id="loom-id-input">
+                <div class="mb-4">
+                    <label for="loom-name" class="block text-sm font-medium text-gray-300 mb-1">Loom Name/ID</label>
+                    <input type="text" id="loom-name" class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="loom-type" class="block text-sm font-medium text-gray-300 mb-1">Loom Type</label>
+                    <select id="loom-type" class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option>Power Loom</option>
+                        <option>Air-Jet Loom</option>
+                        <option>Rapier Loom</option>
+                        <option>Water-Jet Loom</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label for="loom-status" class="block text-sm font-medium text-gray-300 mb-1">Status</label>
+                    <select id="loom-status" class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="Running">Running</option>
+                        <option value="Stopped">Stopped</option>
+                        <option value="Maintenance">Maintenance</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="cancel-modal-button" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white font-medium">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white font-medium">Save Loom</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Main Application Logic -->
+    <script type="module">
+        // --- 3D BACKGROUND EFFECT ---
+        let scene, camera, renderer, fabricPlane, clock;
+
+        function init3DBackground() {
+            scene = new THREE.Scene();
+            clock = new THREE.Clock();
+
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 50;
+
+            // Renderer setup
+            const canvas = document.getElementById('bg-canvas');
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            // Fabric Geometry
+            const geometry = new THREE.PlaneGeometry(300, 300, 50, 50);
+            
+            // Fabric Material
+            const material = new THREE.MeshPhongMaterial({
+                color: 0x1a2b4a,
+                specular: 0x111111,
+                shininess: 5,
+                side: THREE.DoubleSide,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.3
+            });
+
+            fabricPlane = new THREE.Mesh(geometry, material);
+            scene.add(fabricPlane);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 2);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize, false);
+
+            animate();
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const elapsedTime = clock.getElapsedTime();
+            const vertices = fabricPlane.geometry.attributes.position;
+
+            for (let i = 0; i < vertices.count; i++) {
+                const x = vertices.getX(i);
+                const y = vertices.getY(i);
+                const dist = Math.sqrt(x*x + y*y);
+                
+                // Wave animation
+                const z = Math.sin(dist / 10 - elapsedTime * 1.5) * 5;
+                vertices.setZ(i, z);
+            }
+
+            vertices.needsUpdate = true;
+            fabricPlane.geometry.computeVertexNormals(); // for correct lighting
+
+            renderer.render(scene, camera);
+        }
+
+        // --- MOCK DATA (Replace with Firebase) ---
+        // This data simulates what you would fetch from a Firestore database.
+        const mockData = {
+            looms: [
+                { id: 'L001', name: 'Loom 01', type: 'Air-Jet Loom', status: 'Running', fabric: 'Denim', efficiency: 92 },
+                { id: 'L002', name: 'Loom 02', type: 'Rapier Loom', status: 'Running', fabric: 'Cotton Twill', efficiency: 88 },
+                { id: 'L003', name: 'Loom 03', type: 'Power Loom', status: 'Stopped', fabric: 'N/A', efficiency: 0 },
+                { id: 'L004', name: 'Loom 04', type: 'Air-Jet Loom', status: 'Maintenance', fabric: 'Polyester Blend', efficiency: 0 },
+                { id: 'L005', name: 'Loom 05', type: 'Water-Jet Loom', status: 'Running', fabric: 'Nylon', efficiency: 95 },
+            ],
+            production: [
+                { id: 'PO2401', fabric: 'Denim', quantity: 5000, target: '2025-08-15', status: 'In Progress', progress: 65 },
+                { id: 'PO2402', fabric: 'Cotton Twill', quantity: 3200, target: '2025-08-20', status: 'In Progress', progress: 40 },
+                { id: 'PO2403', fabric: 'Nylon', quantity: 8000, target: '2025-08-12', status: 'Completed', progress: 100 },
+            ],
+            inventory: [
+                { id: 'Y01', name: 'Indigo Cotton Yarn', type: 'Cotton', color: 'Indigo', stock: 1250 },
+                { id: 'Y02', name: 'White Polyester Yarn', type: 'Polyester', color: 'White', stock: 800 },
+                { id: 'Y03', name: 'Black Nylon Filament', type: 'Nylon', color: 'Black', stock: 2500 },
+                { id: 'Y04', name: 'Grey Cotton Yarn', type: 'Cotton', color: 'Grey', stock: 450 },
+            ]
+        };
+
+        // --- PAGE RENDERING LOGIC ---
+        const mainContent = document.getElementById('main-content');
+
+        const pages = {
+            dashboard: () => {
+                const runningLooms = mockData.looms.filter(l => l.status === 'Running').length;
+                const totalProduction = mockData.production.reduce((acc, p) => acc + (p.quantity * (p.progress / 100)), 0).toFixed(0);
+                const lowStockItems = mockData.inventory.filter(i => i.stock < 500).length;
+
+                return `
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Card 1: Total Looms -->
+                        <div class="card p-6 rounded-lg">
+                            <h3 class="text-gray-400 text-sm font-medium">Total Looms</h3>
+                            <p class="text-3xl font-bold text-white mt-2">${mockData.looms.length}</p>
+                        </div>
+                        <!-- Card 2: Active Looms -->
+                        <div class="card p-6 rounded-lg">
+                            <h3 class="text-gray-400 text-sm font-medium">Active Looms</h3>
+                            <p class="text-3xl font-bold text-green-400 mt-2">${runningLooms}</p>
+                        </div>
+                        <!-- Card 3: Production Today (meters) -->
+                        <div class="card p-6 rounded-lg">
+                            <h3 class="text-gray-400 text-sm font-medium">Total Production (meters)</h3>
+                            <p class="text-3xl font-bold text-blue-400 mt-2">${totalProduction}</p>
+                        </div>
+                        <!-- Card 4: Low Stock Alerts -->
+                        <div class="card p-6 rounded-lg">
+                            <h3 class="text-gray-400 text-sm font-medium">Low Stock Alerts</h3>
+                            <p class="text-3xl font-bold text-red-400 mt-2">${lowStockItems}</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="card p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold mb-4">Looms Status Overview</h3>
+                            <!-- Placeholder for a chart -->
+                            <div class="h-64 bg-gray-800/50 rounded-md flex items-center justify-center text-gray-500">Chart Placeholder</div>
+                        </div>
+                        <div class="card p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold mb-4">Active Production Orders</h3>
+                            <ul class="space-y-4">
+                                ${mockData.production.filter(p => p.status === 'In Progress').map(p => `
+                                    <li>
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="font-medium">${p.fabric} (${p.id})</span>
+                                            <span class="text-sm text-gray-400">${p.progress}%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${p.progress}%"></div>
+                                        </div>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            },
+            looms: () => `
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold">Looms Management</h2>
+                    <button id="add-loom-button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white font-medium flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        <span>Add Loom</span>
+                    </button>
+                </div>
+                <div class="card rounded-lg overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-800/50">
+                            <tr>
+                                <th class="p-4 font-semibold">Loom ID</th>
+                                <th class="p-4 font-semibold">Type</th>
+                                <th class="p-4 font-semibold">Status</th>
+                                <th class="p-4 font-semibold">Current Fabric</th>
+                                <th class="p-4 font-semibold">Efficiency</th>
+                                <th class="p-4 font-semibold">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${mockData.looms.map(loom => `
+                                <tr class="border-t border-gray-700">
+                                    <td class="p-4 font-medium">${loom.name}</td>
+                                    <td class="p-4 text-gray-300">${loom.type}</td>
+                                    <td class="p-4">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                                            loom.status === 'Running' ? 'bg-green-500/20 text-green-300' :
+                                            loom.status === 'Stopped' ? 'bg-red-500/20 text-red-300' :
+                                            'bg-yellow-500/20 text-yellow-300'
+                                        }">${loom.status}</span>
+                                    </td>
+                                    <td class="p-4 text-gray-300">${loom.fabric}</td>
+                                    <td class="p-4 text-gray-300">${loom.efficiency}%</td>
+                                    <td class="p-4">
+                                        <button class="text-blue-400 hover:text-blue-300">Details</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `,
+            production: () => `
+                <h2 class="text-3xl font-bold mb-6">Production Orders</h2>
+                <div class="card rounded-lg overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-800/50">
+                            <tr>
+                                <th class="p-4 font-semibold">Order ID</th>
+                                <th class="p-4 font-semibold">Fabric Type</th>
+                                <th class="p-4 font-semibold">Quantity (m)</th>
+                                <th class="p-4 font-semibold">Target Date</th>
+                                <th class="p-4 font-semibold">Status</th>
+                                <th class="p-4 font-semibold">Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${mockData.production.map(order => `
+                                <tr class="border-t border-gray-700">
+                                    <td class="p-4 font-medium">${order.id}</td>
+                                    <td class="p-4 text-gray-300">${order.fabric}</td>
+                                    <td class="p-4 text-gray-300">${order.quantity.toLocaleString()}</td>
+                                    <td class="p-4 text-gray-300">${order.target}</td>
+                                    <td class="p-4">
+                                        <span class="font-medium ${order.status === 'Completed' ? 'text-green-400' : 'text-yellow-400'}">${order.status}</span>
+                                    </td>
+                                    <td class="p-4 w-1/4">
+                                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${order.progress}%"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `,
+            inventory: () => `
+                <h2 class="text-3xl font-bold mb-6">Yarn Inventory</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    ${mockData.inventory.map(item => `
+                        <div class="card p-6 rounded-lg text-center">
+                            <h3 class="text-lg font-semibold text-white">${item.name}</h3>
+                            <p class="text-4xl font-bold my-3 ${item.stock < 500 ? 'text-red-400' : 'text-blue-400'}">${item.stock.toLocaleString()}<span class="text-xl font-medium text-gray-400"> kg</span></p>
+                            <p class="text-sm text-gray-400">${item.type} - ${item.color}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `
+        };
+
+        // --- ROUTER & APP LOGIC ---
+        function navigate() {
+            const pageId = window.location.hash.substring(1) || 'dashboard';
+            if (pages[pageId]) {
+                mainContent.innerHTML = pages[pageId]();
+                updateActiveLink(pageId);
+                attachEventListeners(pageId);
+            } else {
+                mainContent.innerHTML = `<p class="text-center text-red-400">Page not found.</p>`;
+            }
+        }
+
+        function updateActiveLink(pageId) {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === `#${pageId}`);
+            });
+        }
+
+        // --- EVENT LISTENERS ---
+        function attachEventListeners(pageId) {
+            if (pageId === 'looms') {
+                document.getElementById('add-loom-button').addEventListener('click', openModal);
+            }
+        }
+        
+        const modal = document.getElementById('loom-modal');
+        const cancelButton = document.getElementById('cancel-modal-button');
+        const loomForm = document.getElementById('loom-form');
+
+        function openModal() {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            loomForm.reset();
+        }
+
+        cancelButton.addEventListener('click', closeModal);
+        loomForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // In a real app, you would get form values and send to Firebase
+            // For now, we just close the modal and could re-render the page
+            console.log('Form submitted. In a real app, this would save data.');
+            closeModal();
+            // To see an update, you'd modify mockData and call navigate()
+            // For example:
+            // mockData.looms.push({ id: 'L006', ... });
+            // navigate();
+        });
+
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+
+        // Initial Load
+        window.addEventListener('hashchange', navigate);
+        window.addEventListener('DOMContentLoaded', () => {
+            init3DBackground();
+            navigate();
+        });
+
+    </script>
+</body>
 </html>
