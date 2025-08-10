@@ -1,73 +1,27 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <!--
-      The rel="icon" attribute specifies the icon for the browser tab.
-      %PUBLIC_URL% will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-    -->
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    
-    <!-- This meta tag is crucial for responsive design, ensuring the site scales correctly on all devices. -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
-    <!-- Sets the color of the browser chrome on mobile devices. -->
     <meta name="theme-color" content="#0a0a0a" />
-    
-    <!-- A brief description of your app for search engine results. -->
     <meta
       name="description"
-      content="FebriFlow - A modern, real-time management system for the textile industry."
+      content="FebriFlow - Modern Looms Management System"
     />
-    
-    <!-- Icon for Apple devices when added to the home screen. -->
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    
-    <!--
-      The manifest.json file provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     
-    <!-- Google Fonts: Inter for a clean, modern UI -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!--
-      Tailwind CSS via CDN for rapid UI development.
-      In a production build, you would typically process this with PostCSS.
-    -->
+    
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!--
-      Three.js Library for 3D background effects.
-      Loading it here ensures it's available to your React components.
-    -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
     <title>FebriFlow | Looms Management</title>
   </head>
   <body>
-    <!-- A message shown to users who have JavaScript disabled in their browser. -->
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    
-    <!--
-      This is the root DOM node where your entire React application will be mounted.
-      Your src/index.js file targets this element.
-    -->
     <div id="root"></div>
-    
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
   </body>
-</html>
