@@ -1,107 +1,89 @@
 import React, { useState, useContext } from 'react';
-
-// Import the AppContext to access global state and functions, like setIsAuthenticated.
 import { AppContext } from '../App';
-
-// In a real app, you would import your Firebase auth functions.
-// import { auth } from '../services/firebase'; // Assuming you have this file
+// import { auth } from '../services/firebase';
 // import { signInWithEmailAndPassword } from 'firebase/auth';
 
 /**
- * The Login component provides a user interface for authentication.
+ * The redesigned Login component with a modern, glassmorphism UI.
  */
 const Login = () => {
-  // Use the useContext hook to get the setIsAuthenticated function from the global context.
   const { setIsAuthenticated } = useContext(AppContext);
-
-  // State to manage the input fields for email and password.
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  // State to manage any error messages during login.
   const [error, setError] = useState('');
 
-  /**
-   * Handles the form submission event.
-   * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
-   */
   const handleLogin = async (e) => {
-    // Prevent the default form submission behavior which reloads the page.
     e.preventDefault();
-    setError(''); // Reset any previous errors.
+    setError('');
 
-    // --- FIREBASE AUTHENTICATION LOGIC ---
-    // The commented-out code below shows how you would handle login with Firebase.
     try {
-      // Use the Firebase auth instance to sign in the user.
+      // --- UNCOMMENT FOR FIREBASE ---
       // await signInWithEmailAndPassword(auth, email, password);
-      
-      // If login is successful:
       console.log('User logged in successfully!');
-      setIsAuthenticated(true); // Update the global authentication state.
-      window.location.hash = '#dashboard'; // Redirect the user to the dashboard.
-
+      setIsAuthenticated(true);
+      window.location.hash = '#dashboard';
     } catch (err) {
-      // If login fails, display an error message to the user.
       console.error("Login Error:", err.message);
       setError('Failed to log in. Please check your email and password.');
     }
   };
 
   return (
-    <div className="flex items-center justify-center mt-10 md:mt-16">
-      <div className="card w-full max-w-md p-8 rounded-lg">
-        <h2 className="text-3xl font-bold text-center text-white mb-6">Welcome Back</h2>
+    <div className="flex items-center justify-center min-h-[calc(100vh-10rem)]">
+      {/* The glass-card class will be defined in index.css */}
+      <div className="glass-card w-full max-w-md p-8 rounded-2xl shadow-lg">
+        <h2 className="text-3xl font-bold text-center text-white mb-2">Welcome Back</h2>
+        <p className="text-center text-gray-400 mb-8">Sign in to access your dashboard</p>
         
         <form onSubmit={handleLogin}>
-          {/* Email Input */}
-          <div className="mb-4">
-            <label className="block text-gray-300 mb-2" htmlFor="email">
-              Email
-            </label>
+          {/* Email Input with Icon */}
+          <div className="relative mb-4">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              {/* Email Icon SVG */}
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>
+            </div>
             <input
-              className="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="input-field"
               type="email"
-              id="email"
+              placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
 
-          {/* Password Input */}
-          <div className="mb-6">
-            <label className="block text-gray-300 mb-2" htmlFor="password">
-              Password
-            </label>
+          {/* Password Input with Icon */}
+          <div className="relative mb-6">
+             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              {/* Lock Icon SVG */}
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
             <input
-              className="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="input-field"
               type="password"
-              id="password"
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
 
-          {/* Error Message Display */}
           {error && (
             <p className="text-red-400 text-sm text-center mb-4">{error}</p>
           )}
 
-          {/* Submit Button */}
+          {/* Upgraded Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300"
+            className="btn-gradient w-full text-white font-bold py-3 px-4 rounded-lg"
           >
             Sign In
           </button>
         </form>
 
-        {/* Link to Register Page */}
         <p className="text-center text-gray-400 text-sm mt-6">
           Don't have an account?{' '}
-          <a href="#register" className="text-blue-400 hover:underline">
+          <a href="#register" className="text-blue-400 hover:underline font-semibold">
             Sign up
           </a>
         </p>
