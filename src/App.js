@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, createContext, useCallback } from 'react';
 import AppLayout from './layouts/AppLayout';
 import AuthLayout from './layouts/AuthLayout';
@@ -6,7 +5,6 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Reports from './pages/Reports';
-import ThreeBackground from './components/ThreeBackground';
 
 export const AppContext = createContext();
 
@@ -19,6 +17,7 @@ function App() {
             const hash = window.location.hash.substring(1) || (isAuthenticated ? 'dashboard' : 'login');
             setPage(hash);
         };
+
         window.addEventListener('hashchange', handleHashChange);
         handleHashChange();
         return () => window.removeEventListener('hashchange', handleHashChange);
@@ -42,15 +41,18 @@ function App() {
 
     return (
         <AppContext.Provider value={{ page, setPage, isAuthenticated, setIsAuthenticated }}>
-            <ThreeBackground />
+            
             {isAuthenticated ? (
-                <AppLayout>{renderPage()}</AppLayout>
+                <AppLayout>
+                    {renderPage()}
+                </AppLayout>
             ) : (
-                <AuthLayout>{renderPage()}</AuthLayout>
+                <AuthLayout>
+                    {renderPage()}
+                </AuthLayout>
             )}
         </AppContext.Provider>
     );
 }
 
 export default App;
-
